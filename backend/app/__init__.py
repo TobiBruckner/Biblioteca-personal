@@ -14,7 +14,23 @@ def create_app(config_class=Config):
 
     db.init_app(app)
     jwt.init_app(app)
-    cors.init_app(app, resources={r"/api/*": {"origins": "*"}})
+
+    cors_opts = {
+        r"/api/*": {
+            "origins": app.config.get('CORS_ORIGINS', '*'),
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+            "allow_headers": [
+                "Content-Type",
+                "Authorization",
+                "X-Requested-With",
+                "Accept",
+                "Origin"
+            ],
+            "expose_headers": ["Authorization"],
+            "supports_credentials": True
+        }
+    }
+    cors.init_app(app, resources=cors_opts)
 
     from app.models import Usuario, Libro, EstadoLectura
 

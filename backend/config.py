@@ -11,4 +11,14 @@ class Config:
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'jwt-dev-secret')
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=7)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
-    CORS_HEADERS = 'Content-Type'
+    CORS_HEADERS = 'Content-Type, Authorization'
+    CORS_SUPPORTS_CREDENTIALS = True
+
+    raw_origins = os.getenv('CORS_ORIGINS', '*')
+    if raw_origins.strip() == '*':
+        CORS_ORIGINS = '*'
+    else:
+        CORS_ORIGINS = [
+            o.strip() for o in raw_origins.split(',')
+            if o.strip()
+        ]
