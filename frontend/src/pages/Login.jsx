@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 export default function Login() {
   const { login } = useAuth()
   const navigate = useNavigate()
+
   const [form, setForm] = useState({ login: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -17,9 +18,15 @@ export default function Login() {
     e.preventDefault()
     setError('')
     setLoading(true)
+
     try {
-      await login(form.login, form.password)
-      navigate('/', { replace: true })
+      const user = await login(form.login, form.password)
+
+      // ✅ REDIRECCIÓN CORRECTA
+      if (user) {
+        navigate('/biblioteca', { replace: true })
+      }
+
     } catch (err) {
       setError(err.response?.data?.error || 'Error al iniciar sesión')
     } finally {
@@ -28,46 +35,42 @@ export default function Login() {
   }
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
-        <h1>📚 Bienvenido de nuevo</h1>
-        <p className="subtitle">Inicia sesión para ver tu biblioteca personal</p>
+    <div className="login-container">
+      <h2>📚 Bienvenido de nuevo</h2>
+      <p>Inicia sesión para ver tu biblioteca personal</p>
 
-        {error && <div className="error-message">{error}</div>}
+      {error && <div className="error-message">{error}</div>}
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Usuario o Email</label>
-            <input
-              type="text"
-              name="login"
-              value={form.login}
-              onChange={handleChange}
-              placeholder="tu_usuario o tu@email.com"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Contraseña</label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              placeholder="••••••••"
-              required
-            />
-          </div>
-
-          <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? 'Iniciando...' : 'Iniciar Sesión'}
-          </button>
-        </form>
-
-        <div className="form-footer">
-          ¿No tienes cuenta? <Link to="/register">Regístrate aquí</Link>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label>Usuario o Email</label>
+          <input
+            type="text"
+            name="login"
+            value={form.login}
+            onChange={handleChange}
+            required
+          />
         </div>
+
+        <div className="form-group">
+          <label>Contraseña</label>
+          <input
+            type="password"
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <button type="submit" disabled={loading}>
+          {loading ? 'Iniciando...' : 'Iniciar Sesión'}
+        </button>
+      </form>
+
+      <div>
+        ¿No tienes cuenta? <Link to="/register">Regístrate</Link>
       </div>
     </div>
   )
