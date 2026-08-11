@@ -9,7 +9,11 @@ class Config:
 
     raw_db_uri = os.getenv('DATABASE_URL', 'sqlite:///biblioteca.db')
     if raw_db_uri.startswith('postgres://'):
-        raw_db_uri = raw_db_uri.replace('postgres://', 'postgresql://', 1)
+        raw_db_uri = raw_db_uri.replace('postgres://', 'postgresql+psycopg://', 1)
+    elif raw_db_uri.startswith('postgresql://'):
+        raw_db_uri = raw_db_uri.replace('postgresql://', 'postgresql+psycopg://', 1)
+    elif raw_db_uri.startswith('postgresql+psycopg2://'):
+        raw_db_uri = raw_db_uri.replace('postgresql+psycopg2://', 'postgresql+psycopg://', 1)
     SQLALCHEMY_DATABASE_URI = raw_db_uri
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
