@@ -6,6 +6,40 @@ from datetime import datetime
 
 libros_bp = Blueprint('libros', __name__)
 
+def _safe_str(value):
+    if value is None:
+        return None
+    s = str(value).strip()
+    return s if s else None
+
+def _safe_int(value):
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        return int(value)
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return None
+
+def _safe_float(value):
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        return float(value)
+    try:
+        return float(value)
+    except (ValueError, TypeError):
+        return None
+
+def _parse_fecha(fecha_str):
+    if not fecha_str:
+        return None
+    try:
+        return datetime.strptime(fecha_str, '%Y-%m-%d').date()
+    except ValueError:
+        return None
+
 @libros_bp.route('', methods=['GET'])
 @jwt_required()
 def get_libros():
@@ -40,14 +74,6 @@ def get_libro(libro_id):
         return jsonify({'error': 'Libro no encontrado en tu biblioteca'}), 404
     return jsonify(estado.to_dict())
 
-def _parse_fecha(fecha_str):
-    if not fecha_str:
-        return None
-    try:
-        return datetime.strptime(fecha_str, '%Y-%m-%d').date()
-    except ValueError:
-        return None
-
 @libros_bp.route('', methods=['POST'])
 @jwt_required()
 def add_libro():
@@ -57,10 +83,12 @@ def add_libro():
     if not data:
         return jsonify({'error': 'No se enviaron datos'}), 400
 
-    if not data.get('titulo') or not data.get('autor'):
+    titulo = _safe_str(data.get('titulo'))
+    autor = _safe_str(data.get('autor'))
+    if not titulo or not autor:
         return jsonify({'error': 'Título y autor son requeridos'}), 400
 
-    isbn = data.get('isbn', '').strip() or None
+    isbn = _safe_str(data.get('isbn'))
 
     libro = None
     if isbn:
@@ -68,15 +96,15 @@ def add_libro():
 
     if not libro:
         libro = Libro(
-            titulo=data['titulo'].strip(),
-            autor=data['autor'].strip(),
+            titulo=titulo,
+            autor=autor,
             isbn=isbn,
-            genero=data.get('genero', '').strip() or None,
-            sinopsis=data.get('sinopsis', '').strip() or None,
-            paginas=data.get('paginas'),
-            anio_publicacion=data.get('anio_publicacion'),
-            editorial=data.get('editorial', '').strip() or None,
-            portada_url=data.get('portada_url', '').strip() or None
+            genero=_safe_str(data.get('genero')),
+            sinopsis=_safe_str(data.get('sinopsis')),
+            paginas=_safe_int(data.get('paginas')),
+            anio_publicacion=_safe_int(data.get('anio_publicacion')),
+            editorial=_safe_str(data.get('editorial')),
+            portada_url=_safe_str(data.get('portada_url'))
         )
         db.session.add(libro)
         db.session.flush()
@@ -96,10 +124,10 @@ def add_libro():
         usuario_id=user_id,
         libro_id=libro.id,
         estado=estado_valor,
-        paginas_leidas=data.get('paginas_leidas', 0),
-        calificacion=data.get('calificacion'),
-        resena=data.get('resena', '').strip() or None,
-        favorito=data.get('favorito', False),
+        paginas_leidas=_safe_int(data.get('paginas_leidas')) or 0,
+        calificacion=_safe_float(data.get('calificacion')),
+        resena=_safe_str(data.get('resena')),
+        favorito=bool(data.get('favorito', False)),
         fecha_inicio=_parse_fecha(data.get('fecha_inicio')),
         fecha_fin=_parse_fecha(data.get('fecha_fin'))
     )
@@ -125,23 +153,27 @@ def update_libro(libro_id):
 
     libro = estado.libro
     if 'titulo' in data:
-        libro.titulo = data['titulo'].strip()
+        v = _safe_str(data['titulo'])
+        if v is not None:
+            libro.titulo = v
     if 'autor' in data:
-        libro.autor = data['autor'].strip()
+        v = _safe_str(data['autor'])
+        if v is not None:
+            libro.autor = v
     if 'isbn' in data:
-        libro.isbn = data['isbn'].strip() or None
+        libro.isbn = _safe_str(data['isbn'])
     if 'genero' in data:
-        libro.genero = data['genero'].strip() or None
+        libro.genero = _safe_str(data['genero'])
     if 'sinopsis' in data:
-        libro.sinopsis = data['sinopsis'].strip() or None
+        libro.sinopsis = _safe_str(data['sinopsis'])
     if 'paginas' in data:
-        libro.paginas = data['paginas']
+        libro.paginas = _safe_int(data['paginas'])
     if 'anio_publicacion' in data:
-        libro.anio_publicacion = data['anio_publicacion']
+        libro.anio_publicacion = _safe_int(data['anio_publicacion'])
     if 'editorial' in data:
-        libro.editorial = data['editorial'].strip() or None
+        libro.editorial = _safe_str(data['editorial'])
     if 'portada_url' in data:
-        libro.portada_url = data['portada_url'].strip() or None
+        libro.portada_url = _safe_str(data['portada_url'])
 
     if 'estado' in data and data['estado'] in ESTADO_LECTURA.values():
         estado.estado = data['estado']
@@ -151,13 +183,14 @@ def update_libro(libro_id):
             estado.fecha_fin = datetime.utcnow().date()
 
     if 'paginas_leidas' in data:
-        estado.paginas_leidas = data['paginas_leidas']
+        v = _safe_int(data['paginas_leidas'])
+        estado.paginas_leidas = v if v is not None else 0
     if 'calificacion' in data:
-        estado.calificacion = data['calificacion']
+        estado.calificacion = _safe_float(data['calificacion'])
     if 'resena' in data:
-        estado.resena = data['resena'].strip() or None
+        estado.resena = _safe_str(data['resena'])
     if 'favorito' in data:
-        estado.favorito = data['favorito']
+        estado.favorito = bool(data['favorito'])
     if 'fecha_inicio' in data:
         estado.fecha_inicio = _parse_fecha(data['fecha_inicio'])
     if 'fecha_fin' in data:
