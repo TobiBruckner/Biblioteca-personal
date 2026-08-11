@@ -6,7 +6,12 @@ load_dotenv()
 
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key')
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///biblioteca.db')
+
+    raw_db_uri = os.getenv('DATABASE_URL', 'sqlite:///biblioteca.db')
+    if raw_db_uri.startswith('postgres://'):
+        raw_db_uri = raw_db_uri.replace('postgres://', 'postgresql://', 1)
+    SQLALCHEMY_DATABASE_URI = raw_db_uri
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'jwt-dev-secret')
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=7)
