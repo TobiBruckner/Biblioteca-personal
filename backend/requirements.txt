@@ -6,4 +6,5 @@ Werkzeug==3.0.3
 python-dotenv==1.0.1
 email-validator==2.2.0
 gunicorn
-psycopg[binary]==3.2.3
+psycopg==3.2.13
+psycopg-binary==3.2.13
