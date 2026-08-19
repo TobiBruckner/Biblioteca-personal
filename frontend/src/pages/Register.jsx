@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext.jsx'
+import api from '../services/api'
 
 export default function Register() {
-  const { register } = useAuth()
   const navigate = useNavigate()
   const [form, setForm] = useState({
     username: '',
@@ -34,8 +33,19 @@ export default function Register() {
 
     setLoading(true)
     try {
-      await register(form.username, form.email, form.password, form.nombre_completo)
-      navigate('/', { replace: true })
+      await api.post('/auth/register', {
+        username: form.username,
+        email: form.email,
+        password: form.password,
+        nombre_completo: form.nombre_completo
+      })
+      navigate('/login', {
+        replace: true,
+        state: {
+          registered: true,
+          username: form.username
+        }
+      })
     } catch (err) {
       setError(err.response?.data?.error || 'Error al registrarse')
     } finally {
