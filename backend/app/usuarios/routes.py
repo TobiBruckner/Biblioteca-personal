@@ -3,8 +3,23 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app import db
 from app.models import Usuario, EstadoLectura, ESTADO_LECTURA
 from sqlalchemy import func
+try:
+    from email_validator import validate_email, EmailNotValidError
+    HAS_EMAIL_VALIDATOR = True
+except ImportError:
+    HAS_EMAIL_VALIDATOR = False
 
 usuarios_bp = Blueprint('usuarios', __name__)
+
+def _safe_str(value, max_len=None):
+    if value is None:
+        return None
+    s = str(value).strip()
+    if s == '':
+        return None
+    if max_len and len(s) > max_len:
+        s = s[:max_len]
+    return s
 
 def _build_usuario_publico(usuario, current_user_id):
     q = EstadoLectura.query.filter_by(usuario_id=usuario.id)

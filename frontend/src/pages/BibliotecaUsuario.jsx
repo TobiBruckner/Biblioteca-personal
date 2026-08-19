@@ -96,7 +96,7 @@ export default function BibliotecaUsuario() {
             }}>
               {(perfil?.nombre_completo || perfil?.username || '?').charAt(0).toUpperCase()}
             </div>
-            <div>
+            <div style={{ minWidth: 0, maxWidth: '500px' }}>
               <h1 style={{ fontSize: '1.6rem', margin: 0 }}>
                 📚 Biblioteca de {perfil?.nombre_completo || perfil?.username}
                 {esMia && <span className="badge-fav" style={{ marginLeft: '10px' }}>Tú</span>}

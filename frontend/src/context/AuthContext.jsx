@@ -11,7 +11,9 @@ export function AuthProvider({ children }) {
     const token = localStorage.getItem('access_token')
     const storedUser = localStorage.getItem('usuario')
     if (token && storedUser) {
-      setUsuario(JSON.parse(storedUser))
+      try {
+        setUsuario(JSON.parse(storedUser))
+      } catch {}
     }
     setLoading(false)
   }, [])

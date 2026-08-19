@@ -5,6 +5,7 @@ import { usuariosAPI } from '../services/api.js'
 export default function Community() {
   const [usuarios, setUsuarios] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [search, setSearch] = useState('')
   const [myId, setMyId] = useState(null)
 
@@ -17,12 +18,19 @@ export default function Community() {
 
   const load = async () => {
     setLoading(true)
+    setError(null)
     try {
       const lista = await usuariosAPI.listar(search.trim())
       setUsuarios(lista)
     } catch (err) {
       console.error(err)
-      alert(err.response?.data?.error || 'Error al cargar la comunidad')
+      const msg = err.response?.data?.error || err.message || 'Error al cargar la comunidad'
+      const status = err.response?.status
+      setError({
+        msg,
+        status,
+        hint: (status === 404 || !status) ? 'Si estás en producción probablemente el backend no tiene el blueprint "usuarios" deployado todavía. Asegurate de hacer Manual Deploy en Render del último commit.' : 'Revisá que el backend esté funcionando correctamente.'
+      })
     } finally {
       setLoading(false)
     }
@@ -62,6 +70,19 @@ export default function Community() {
 
       {loading ? (
         <div className="loading">Cargando comunidad...</div>
+      ) : error ? (
+        <div className="stat-card">
+          <h3 style={{ color: 'var(--color-danger)', marginBottom: '8px' }}>⚠️ {error.msg}</h3>
+          {error.status && (
+            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '8px' }}>
+              Código de respuesta: <b>HTTP {error.status}</b>
+            </p>
+          )}
+          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginBottom: '16px' }}>
+            💡 {error.hint}
+          </p>
+          <button className="btn btn-primary" onClick={load}>🔄 Reintentar</button>
+        </div>
       ) : usuarios.length === 0 ? (
         <div className="empty-state">
           <h3>👤 Todavía no hay usuarios</h3>
@@ -72,6 +93,7 @@ export default function Community() {
           {usuarios.map((u) => {
             const stats = u.estadisticas || {}
             const esYo = u.id === myId
+            const displayName = u.nombre_completo || u.username || 'Usuario'
             return (
               <div key={u.id} className="stat-card" style={{ cursor: 'auto' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
@@ -80,13 +102,14 @@ export default function Community() {
                       width: '44px', height: '44px', borderRadius: '50%',
                       background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: 'white', fontWeight: '700', fontSize: '1.1rem'
+                      color: 'white', fontWeight: '700', fontSize: '1.1rem',
+                      flexShrink: 0
                     }}>
-                      {(u.nombre_completo || u.username || '?').charAt(0).toUpperCase()}
+                      {displayName.charAt(0).toUpperCase()}
                     </div>
                     <div>
                       <div style={{ fontWeight: '700', fontSize: '1rem' }}>
-                        {u.nombre_completo || u.username}
+                        {displayName}
                         {esYo && (
                           <span className="badge-fav" style={{ marginLeft: '8px' }}>Tú</span>
                         )}
@@ -145,7 +168,7 @@ export default function Community() {
                   className="btn btn-primary"
                   style={{ width: '100%' }}
                 >
-                  🔖 {esYo ? 'Ir a mi biblioteca' : `Ver biblioteca de ${(u.nombre_completo || u.username).split(' ')[0]}`}
+                  🔖 {esYo ? 'Ir a mi biblioteca' : `Ver biblioteca de ${displayName.split(' ')[0]}`}
                 </Link>
               </div>
             )
