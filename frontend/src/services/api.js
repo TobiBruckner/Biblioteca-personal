@@ -47,4 +47,10 @@ api.interceptors.response.use(
   }
 )
 
+export const usuariosAPI = {
+  listar: (search = '') => api.get('/usuarios', { params: search ? { search } : {} }).then(r => r.data),
+  detalle: (id) => api.get(`/usuarios/${id}`).then(r => r.data),
+  biblioteca: (id, params = {}) => api.get(`/usuarios/${id}/libros`, { params }).then(r => r.data)
+}
+
 export default api

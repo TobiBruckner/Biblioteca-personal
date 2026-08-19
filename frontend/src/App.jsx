@@ -7,6 +7,8 @@ import Dashboard from './pages/Dashboard.jsx'
 import Biblioteca from './pages/Biblioteca.jsx'
 import EnCurso from './pages/EnCurso.jsx'
 import QuieroLeer from './pages/QuieroLeer.jsx'
+import Community from './pages/Community.jsx'
+import BibliotecaUsuario from './pages/BibliotecaUsuario.jsx'
 
 function PrivateRoute({ children }) {
   const { isAuthenticated, loading } = useAuth()
@@ -55,6 +57,8 @@ export default function App() {
         <Route path="biblioteca" element={<Biblioteca />} />
         <Route path="en-curso" element={<EnCurso />} />
         <Route path="quiero-leer" element={<QuieroLeer />} />
+        <Route path="comunidad" element={<Community />} />
+        <Route path="usuario/:id/biblioteca" element={<BibliotecaUsuario />} />
       </Route>
 
       {/* fallback */}

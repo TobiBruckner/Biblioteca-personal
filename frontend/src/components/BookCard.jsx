@@ -58,18 +58,24 @@ export default function BookCard({ libroEstado, onEdit, onDelete }) {
         </div>
       </div>
 
-      <div className="book-actions">
-        <button className="btn btn-secondary btn-sm" onClick={() => onEdit?.(libroEstado)} style={{ flex: 1 }}>
-          ✏️ Editar
-        </button>
-        <button
-          className="btn btn-danger btn-sm"
-          onClick={() => window.confirm(`¿Eliminar "${libro?.titulo}" de tu biblioteca?`) && onDelete?.(libro.id)}
-          title="Eliminar"
-        >
-          🗑️
-        </button>
-      </div>
+      {(onEdit || onDelete) && (
+        <div className="book-actions">
+          {onEdit && (
+            <button className="btn btn-secondary btn-sm" onClick={() => onEdit(libroEstado)} style={{ flex: 1 }}>
+              ✏️ Editar
+            </button>
+          )}
+          {onDelete && (
+            <button
+              className="btn btn-danger btn-sm"
+              onClick={() => window.confirm(`¿Eliminar "${libro?.titulo}" de tu biblioteca?`) && onDelete(libro.id)}
+              title="Eliminar"
+            >
+              🗑️
+            </button>
+          )}
+        </div>
+      )}
     </div>
   )
 }

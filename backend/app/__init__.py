@@ -39,10 +39,12 @@ def create_app(config_class=Config):
 
     from app.auth.routes import auth_bp
     from app.libros.routes import libros_bp
+    from app.usuarios.routes import usuarios_bp
     from app.main.routes import main_bp
 
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(libros_bp, url_prefix='/api/libros')
+    app.register_blueprint(usuarios_bp, url_prefix='/api/usuarios')
     app.register_blueprint(main_bp, url_prefix='/api')
 
     return app
