@@ -109,8 +109,10 @@ export default function BibliotecaUsuario() {
           </div>
 
           <div style={{
-            display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)',
-            gap: '14px', minWidth: '420px'
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))',
+            gap: '12px',
+            width: '100%'
           }}>
             <div style={{ textAlign: 'center' }}>
               <div style={{
@@ -162,14 +164,17 @@ export default function BibliotecaUsuario() {
               key={f.key}
               onClick={() => setEstado(f.key)}
               style={{
-                padding: '8px 14px', border: 'none', background: 'transparent',
+                padding: '8px 14px', border: 'none',
                 color: estado === f.key ? 'white' : 'var(--color-text-muted)',
                 fontSize: '0.85rem', fontWeight: estado === f.key ? '600' : '500',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
-                background: estado === f.key
+                backgroundColor: estado === f.key
+                  ? ''
+                  : 'transparent',
+                backgroundImage: estado === f.key
                   ? 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))'
-                  : 'transparent'
+                  : 'none'
               }}
             >
               {f.label}
@@ -198,13 +203,16 @@ export default function BibliotecaUsuario() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           style={{
-            padding: '8px 12px', marginLeft: 'auto',
+            padding: '8px 12px',
             background: 'var(--color-bg-input)',
             border: '1px solid var(--color-border)',
             borderRadius: 'var(--radius-md)',
             color: 'var(--color-text)',
             fontSize: '0.9rem',
-            minWidth: '240px'
+            minWidth: '180px',
+            width: '100%',
+            maxWidth: '320px',
+            marginLeft: 'auto'
           }}
         />
       </div>

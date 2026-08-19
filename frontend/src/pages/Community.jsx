@@ -49,7 +49,7 @@ export default function Community() {
           <h1>👥 Comunidad</h1>
           <p>Explora las bibliotecas de otros lectores ({usuarios.length} usuarios)</p>
         </div>
-        <div>
+        <div style={{ width: '100%', maxWidth: '360px' }}>
           <input
             type="text"
             placeholder="🔍 Buscar usuario..."
@@ -62,7 +62,7 @@ export default function Community() {
               borderRadius: 'var(--radius-md)',
               color: 'var(--color-text)',
               fontSize: '0.95rem',
-              minWidth: '260px'
+              width: '100%'
             }}
           />
         </div>

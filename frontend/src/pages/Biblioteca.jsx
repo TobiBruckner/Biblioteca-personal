@@ -49,7 +49,7 @@ export default function Biblioteca() {
           <h1>📚 Mi Biblioteca</h1>
           <p>Todos tus libros en un solo lugar (total: {libros.length})</p>
         </div>
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', width: '100%' }}>
           <input
             type="text"
             placeholder="🔍 Buscar por título o autor..."
@@ -62,7 +62,9 @@ export default function Biblioteca() {
               borderRadius: 'var(--radius-md)',
               color: 'var(--color-text)',
               fontSize: '0.95rem',
-              minWidth: '250px'
+              flex: '1 1 200px',
+              minWidth: '160px',
+              maxWidth: '360px'
             }}
           />
           <button className="btn btn-primary" onClick={() => { setEditItem(null); setModalOpen(true) }}>
